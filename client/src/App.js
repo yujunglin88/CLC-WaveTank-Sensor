@@ -16,13 +16,11 @@ function App() {
                   {name: 'Page F',uv: 2390,pv: 3800,amt: 2500,},
                   {name: 'Page G',uv: 3490,pv: 4300,amt: 2100}
   ];
-  
-
 
                   
   const renderLineChart = (
-    <LineChart width={600} height={300} data={test_data}>
-      <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+    <LineChart width={600} height={300} data={data}>
+      <Line type="monotone" dataKey="pressure" stroke="#8884d8" />
       <CartesianGrid stroke="#ccc" />
       <XAxis dataKey="name" />
       <YAxis />
@@ -37,7 +35,7 @@ function App() {
         fetch("/api")
         .then((res) => res.json())
         .then((data) => {
-          setData(data.pressure_data.join(", "));
+          setData(data.data_stream);
         });
       } catch (error) {
           // no need to update the state if the fetch fails

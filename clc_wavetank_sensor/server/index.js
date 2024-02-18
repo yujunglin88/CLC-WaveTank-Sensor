@@ -33,8 +33,7 @@ var port = new SerialPort({ path: 'COM4', baudRate: 9600 });
 const { ReadlineParser  } = require('@serialport/parser-readline');
 
 //pressure data array
-var pressure_data = [];
-var water_depth = [];
+var data_stream = []; // [{tick: 1, pressure: 1000, water_depth: 0.1}, ...]
 var average_pressure;
 
 const parser = port.pipe(new ReadlineParser());
@@ -44,17 +43,13 @@ parser.on('data', function(data){
 
     console.log(data.toString());
     // add current tick to the pressure data
-    pressure_data.push(data.toString());
-    
-    //calculate current water depth and push to water depth array
-    water_depth.push(calculate_water_depth(data.toString()));
+    data_stream.push({tick: tick, 
+                      pressure: data.toString(), 
+                      water_depth: calculate_water_depth(data.toString())});
     
     //calculate average pressure and set average pressure to current pressure
-    average_pressure = calculate_average_pressure(pressure_data);
-
+    average_pressure = calculate_average_pressure(data_stream);
 });
-
-
 
 
 
@@ -66,11 +61,9 @@ parser.on('error', function(err){
 app.get("/api", (req, res) => {
     //send the last 10 pressure data
     res.json({ 
-        tick: tick,
-        // array[:-50]: pressure data
-        pressure_data: pressure_data.slice(-50),
-        // array[:-50]: water depth
-        water_depth: water_depth.slice(-50),
+        // array[:-50]: last 50 elements of the array
+        data_stream: data_stream.slice(-50),
+
         // average pressure
         average_pressure: average_pressure
 
