@@ -1,11 +1,12 @@
 import React from "react";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend , ReferenceLine} from 'recharts';
 import "./App.css";
 
 
 
 function App() {
   const [data, setData] = React.useState(null);
+  const [average_pressure, setAveragePressure] = React.useState(0);
 
   const test_data = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400},
                   {name: 'Page B', uv: 3000,pv: 1398,amt: 2210,},
@@ -16,13 +17,16 @@ function App() {
                   {name: 'Page G',uv: 3490,pv: 4300,amt: 2100}
   ];
 
-                  
+
   const renderLineChart = (
-    <LineChart width={600} height={300} data={data}>
+    <LineChart width={1400} height={800} data={data} 
+      margin={{ top: 5, right: 30, left: 50, bottom: 5 }}>
       <Line type="monotone" dataKey="pressure" stroke="#8884d8" />
+      <ReferenceLine y={average_pressure} label="Average Depth" stroke="red" strokeDasharray="3 3" />
       <CartesianGrid stroke="#ccc" />
-      <XAxis dataKey="name" />
-      <YAxis />
+      <YAxis domain={[100000, 100300]}/>
+      <Tooltip />
+      <Legend />
     </LineChart>
   );
 
@@ -35,6 +39,8 @@ function App() {
         .then((res) => res.json())
         .then((data) => {
           setData(data.data_stream);
+          setAveragePressure(data.average_pressure);
+          console.log(data.average_pressure);
         });
       } catch (error) {
           // no need to update the state if the fetch fails
