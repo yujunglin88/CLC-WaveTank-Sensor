@@ -1,5 +1,4 @@
 import React from "react";
-import logo from "./logo.svg";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
 import "./App.css";
 
