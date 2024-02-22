@@ -7,17 +7,35 @@ import "./App.css";
 function App() {
   const [data, setData] = React.useState(null);
   const [average_pressure, setAveragePressure] = React.useState(0);
-  const [data_y_min, setDataYMin] = React.useState(0);
-  const [data_y_max, setDataYMax] = React.useState(0);
+  const [average_water_depth, setAverageWaterDepth] = React.useState(0);
+  const [data_p_y_min, setDataPYMin] = React.useState(0);
+  const [data_p_y_max, setDataPYMax] = React.useState(0);
+  const [data_w_y_min, setDataWYMin] = React.useState(0);
+  const [data_w_y_max, setDataWYMax] = React.useState(0);
 
-  const renderLineChart = (
-    <LineChart width={1400} height={800} data={data} 
+
+  const renderPressureChart = (
+    <LineChart width={1600} height={400} data={data} 
       margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
       <Line type="monotone" isAnimationActive={false} dot={false} dataKey="pressure" stroke="#8884d8" />
       <Line type="monotone" isAnimationActive={false} dot={false} dataKey="ambient_pressure" stroke="#8884d8" />
-      <ReferenceLine y={average_pressure} label="Average Depth" stroke="red" strokeDasharray="3 3" />
+      <ReferenceLine y={average_pressure} label="Average Pressure" stroke="red" strokeDasharray="3 3" />
       {/* <CartesianGrid stroke="#ccc" /> */}
-      <YAxis domain={[data_y_min, data_y_max]}/>
+      <YAxis domain={[data_p_y_min, data_p_y_max]}/>
+      <Tooltip />
+      <Legend />
+    </LineChart>
+  );
+
+  const renderDepthChart = (
+    <LineChart width={1600} height={400} data={data} 
+      margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
+      {/* <Line type="monotone" isAnimationActive={false} dot={false} dataKey="water_depth" stroke="#8884d8" />
+      <ReferenceLine y={average_water_depth} label="Average Depth" stroke="red" strokeDasharray="3 3" /> */}
+      <Line type="monotone" isAnimationActive={false} dot={false} dataKey="water_relative" stroke="#8884d8" />
+      <ReferenceLine y={0} label="Water Line" stroke="red" strokeDasharray="3 3" />
+      {/* <CartesianGrid stroke="#ccc" /> */}
+      <YAxis domain={[data_w_y_min, data_w_y_max]} />
       <Tooltip />
       <Legend />
     </LineChart>
@@ -34,16 +52,18 @@ function App() {
             console.log(data);
             setData(data.data_stream);
             setAveragePressure(data.average_pressure);
-            setDataYMin(data.data_y_min);
-            setDataYMax(data.data_y_max);
-
+            setAverageWaterDepth(data.average_water_depth);
+            setDataPYMin(data.data_y_min);
+            setDataPYMax(data.data_y_max);
+            setDataWYMin(data.data_w_y_min);
+            setDataWYMax(data.data_w_y_max);
           });
 
       } catch (error) {
-          // no need to update the state if the fetch fails
+        // no need to update the state if the fetch fails
       }
       
-    }, 50);
+    }, 100);
     return () => clearInterval(interval);
   }, []);
 
@@ -54,7 +74,8 @@ function App() {
       <header className="App-header">
         {/* <img src={logo} className="App-logo" alt="logo" /> */}
         {/* <p>{!data ? "Loading..." : data}</p> */}
-        <p>{renderLineChart}</p>
+        <p>{renderPressureChart}</p>
+        <p>{renderDepthChart}</p>
       </header>
     </div>
   );
