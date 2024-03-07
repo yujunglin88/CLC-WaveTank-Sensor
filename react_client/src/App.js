@@ -35,6 +35,7 @@ function useWindowDimensions() {
 
 function App() {
   const [isFetchingData, setIsFetchingData] = useState(false);
+  const [chart_type, setChartType] = useState('Relative');
   const { height, width } = useWindowDimensions();
   const [data, setData] = useState(null);
   const [average_pressure, setAveragePressure] = useState(0);
@@ -43,7 +44,6 @@ function App() {
   const [data_p_y_max, setDataPYMax] = useState(0);
   const [data_w_y_min, setDataWYMin] = useState(0);
   const [data_w_y_max, setDataWYMax] = useState(0);
-  const [chart_type, setChartType] = useState('Relative');
 
   const ChartSelecter = () => {
     const containerStyle = {
@@ -74,13 +74,16 @@ function App() {
       </div>
     );};
 
-  const [chart_height, updateChartHeight] = useState(height / 2.5);
+  const [chart_height, updateChartHeight] = useState(height / 3);
+  const [chart_width, updateChartWidth] = useState(width - 20);
   useEffect(() => {
-    updateChartHeight(height / 2.5);
+    updateChartHeight(height / 3);
+    updateChartWidth(width - 80);
+    
   }, [height]);
 
   const renderPressureChart = (
-    <LineChart width={width} height={chart_height} data={data} 
+    <LineChart width={chart_width} height={chart_height} data={data} 
       margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
       <Line type="monotone" isAnimationActive={false} dot={false} dataKey="pressure" stroke="#8884d8" />
       <Line type="monotone" isAnimationActive={false} dot={false} dataKey="ambient_pressure" stroke="#8884d8" />
@@ -92,7 +95,7 @@ function App() {
   );
 
   const renderDepthChartRelative = (
-    <LineChart width={width} height={chart_height} data={data} 
+    <LineChart width={chart_width} height={chart_height} data={data} 
       margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
       {/* <Line type="monotone" isAnimationActive={false} dot={false} dataKey="water_depth" stroke="#8884d8" />
       <ReferenceLine y={average_water_depth} label="Average Depth" stroke="red" strokeDasharray="3 3" /> */}
@@ -105,7 +108,7 @@ function App() {
   );
 
   const renderDepthChartAbsolute = (
-    <LineChart width={width} height={chart_height} data={data} 
+    <LineChart width={chart_width} height={chart_height} data={data} 
       margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
       <Line type="monotone" isAnimationActive={false} dot={false} dataKey="water_depth" stroke="#8884d8" />
       <ReferenceLine y={average_water_depth} label="Average Depth" stroke="red" strokeDasharray="3 3" />
@@ -154,10 +157,16 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-      {<ChartSelecter/>}
-      <Toggle toggle={isFetchingData} handleToggleChange={handleToggleChange} on = "On" off = "Paused" />
-      {renderPressureChart}
-      {chart_type == "Relative" ? renderDepthChartRelative : renderDepthChartAbsolute}
+        {<ChartSelecter/>}
+        <Toggle toggle={isFetchingData} handleToggleChange={handleToggleChange} on="On" off="Paused" />
+        <div className="Chart-container" header="Pressure Reading">
+          Pressure Reading
+          {renderPressureChart}
+        </div>
+        <div className="Chart-container" header="Water Level Translated"> 
+          Water Level Translated
+          {chart_type == "Relative" ? renderDepthChartRelative : renderDepthChartAbsolute}
+        </div>
       </header>
     </div>
   );

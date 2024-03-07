@@ -28,6 +28,13 @@
   color: #61dafb;
 }
 
+.Chart-container {
+  border: dashed;
+  border-width: 2px 4px;
+  border-radius: 40px;
+  padding: 20px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
