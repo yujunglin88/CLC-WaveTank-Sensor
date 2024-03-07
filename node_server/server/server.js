@@ -25,6 +25,7 @@ const gravity  = 9.81;
 var ambient_pressure; // pressure above sea level
 var pressure_data = []; // [1000, 1001, 1002, ...]
 var water_depth_data = []; // [0.1, 0.2, 0.3, ...]
+var water_relative_data = []; // [-0.1, 0, 0.1, ...
 var data_out = []; // [{tick: 1, pressure: 1000, water_depth: 0.1}, ...]
 
 var water_depth = 0;
@@ -75,9 +76,13 @@ parser.on('data', function(data){
   
   // remove '\r\n' from the data
   data = data.replace(/(\r\n|\n|\r)/gm, "");
-
-  //parse json data
-  data = JSON.parse(data);
+  try {
+    //parse json data
+    data = JSON.parse(data);
+  } catch (error) {
+    console.log("Error parsing JSON: " + error)
+    return
+  }
   
   //calculate average pressure and set average pressure to current pressure
   average_pressure    = calculate_average_pressure(pressure_data.slice(-50));
@@ -90,8 +95,8 @@ parser.on('data', function(data){
 
   data_p_y_max = (Math.max(...data_out.map(x => x.pressure)) + 500);
   data_p_y_min = (ambient_pressure - 500);
-  data_w_y_max = (Math.max(...data_out.map(x => x.water_depth)) + 0.5);
-  data_w_y_min = (Math.min(...data_out.map(x => x.water_depth)) - 0.5);
+  data_w_y_max = (Math.max(...data_out.map(x => x.water_relative)) + 0.5);
+  data_w_y_min = (Math.min(...data_out.map(x => x.water_relative)) - 0.5);
 
   pressure_data.push(data.pressure_1);
   water_depth_data.push(water_depth);
@@ -106,10 +111,11 @@ parser.on('data', function(data){
   if (tick > DATA_STREAM_SIZE){
     pressure_data.shift();
     water_depth_data.shift();
+    water_relative_data.shift();
     data_out.shift();
   }
 
-  console.log("Ambient Pressure: ",data.pressure_2, "\tWater Pressure: ", data.pressure_1, "\trelative: ", relative);
+  console.log("Ambient Pressure: ",data.pressure_2, "\tWater Pressure: ", data.pressure_1, "\trelative: ", water_relative);
 });
 
 // Handle error event
