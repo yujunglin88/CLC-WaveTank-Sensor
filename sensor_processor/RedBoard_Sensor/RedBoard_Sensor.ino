@@ -61,7 +61,4 @@ void loop()
         Serial.print("Error getting data from sensor! Error code: ");
         Serial.println(err_1);
     }
-
-    // Only print every second
-    delay(100);
 }

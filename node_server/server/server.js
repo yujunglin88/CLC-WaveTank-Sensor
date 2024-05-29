@@ -5,8 +5,14 @@
 const express = require("express");
 const cors = require("cors");
 
+// const BAUD_RATE = 9600;
+const BAUD_RATE = 115200;
 const PORT = process.env.PORT || 3001;
 const USB_PORT = 'COM4';
+const static_ambient = 101390;
+
+
+var mode_ambient = false;
 
 const app = express();
 app.use(cors());
@@ -46,14 +52,15 @@ var data_w_y_max = 0;
 
 // Read in arduino data from USB port
 const {SerialPort} = require('serialport');
-var port = new SerialPort({ path: USB_PORT, baudRate: 9600 });
+var port = new SerialPort({ path: USB_PORT, baudRate: BAUD_RATE });
 const { ReadlineParser  } = require('@serialport/parser-readline');
 
 // Calculate water depth
 function calculate_water_depth(pressure){
   // round to 2 decimal places
-  return Math.round(((pressure- ambient_pressure) / (fluid_density * gravity))*10000)/100 ;
+  return Math.round(((pressure - (mode_ambient? ambient_pressure : static_ambient)) / (fluid_density * gravity))*10000)/100 ;
 }
+
 
 // Calculate average pressure
 function calculate_average_pressure(pressure_data){
@@ -80,7 +87,7 @@ parser.on('data', function(data){
     //parse json data
     data = JSON.parse(data);
   } catch (error) {
-    console.log("Error parsing JSON: " + error)
+    console.log(data)
     return
   }
   
